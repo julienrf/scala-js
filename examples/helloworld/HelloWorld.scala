@@ -10,17 +10,12 @@ import js.annotation._
 
 object HelloWorld extends js.JSApp {
   def main() {
-    import js.DynamicImplicits.truthValue
 
-    if (js.Dynamic.global.document &&
-        js.Dynamic.global.document.getElementById("playground")) {
-      sayHelloFromDOM()
-      sayHelloFromTypedDOM()
-      sayHelloFromJQuery()
-      sayHelloFromTypedJQuery()
-    } else {
-      println("Hello world!")
-    }
+    val ab01Chars = scala.Array("ab".toCharArray, "01".toCharArray)
+    val chars = new scala.Array[Array[Char]](32)
+    System.arraycopy(ab01Chars, 0, chars, 0, 2)
+    chars.filter(_ => true).foreach(println)
+
   }
 
   def sayHelloFromDOM() {

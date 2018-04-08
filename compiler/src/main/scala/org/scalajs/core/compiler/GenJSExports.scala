@@ -749,8 +749,9 @@ trait GenJSExports extends SubComponent { self: GenJSCode =>
 
       // optional repeated parameter list
       val jsVarArgPrep = repeatedTpe map { tpe =>
-        // new WrappedArray(varargs)
-        val rhs = genNew(WrappedArrayClass, WrappedArray_ctor, List(
+        // TODO Cross-version support
+        // new ImmutableArray(varargs)
+        val rhs = genNew(ImmutableArrayClass, ImmutableArray_ctor, List(
             genVarargRef(normalArgc, minArgc)))
         js.VarDef(js.Ident("prep" + normalArgc), rhs.tpe, mutable = false, rhs)
       }

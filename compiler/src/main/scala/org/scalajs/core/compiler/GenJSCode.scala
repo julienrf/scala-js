@@ -4650,35 +4650,35 @@ abstract class GenJSCode extends plugins.PluginComponent
      */
     private def genActualArgs(sym: Symbol, args: List[Tree])(
         implicit pos: Position): List[js.Tree] = {
-      val wereRepeated = exitingPhase(currentRun.typerPhase) {
-        /* Do NOT use `params` instead of `paramss.flatten` here! Exiting
-         * typer, `params` only contains the *first* parameter list.
-         * This was causing #2265 and #2741.
-         */
-        sym.tpe.paramss.flatten.map(p => isScalaRepeatedParamType(p.tpe))
-      }
-
-      if (wereRepeated.size > args.size) {
+//      val wereRepeated = exitingPhase(currentRun.typerPhase) {
+//        /* Do NOT use `params` instead of `paramss.flatten` here! Exiting
+//         * typer, `params` only contains the *first* parameter list.
+//         * This was causing #2265 and #2741.
+//         */
+//        sym.tpe.paramss.flatten.map(p => isScalaRepeatedParamType(p.tpe))
+//      }
+//
+//      if (wereRepeated.size > args.size) {
         // Should not happen, but let's not crash
         args.map(genExpr)
-      } else {
-        /* Arguments that are in excess compared to the type signature after
-         * typer are lambda-lifted arguments. They cannot be repeated, hence
-         * the extension to `false`.
-         */
-        for ((arg, wasRepeated) <- args.zipAll(wereRepeated, EmptyTree, false)) yield {
-          if (wasRepeated) {
-            tryGenRepeatedParamAsJSArray(arg, handleNil = false).fold {
-              genExpr(arg)
-            } { genArgs =>
-              genNew(WrappedArrayClass, WrappedArray_ctor,
-                  List(js.JSArrayConstr(genArgs)))
-            }
-          } else {
-            genExpr(arg)
-          }
-        }
-      }
+//      } else {
+//        /* Arguments that are in excess compared to the type signature after
+//         * typer are lambda-lifted arguments. They cannot be repeated, hence
+//         * the extension to `false`.
+//         */
+//        for ((arg, wasRepeated) <- args.zipAll(wereRepeated, EmptyTree, false)) yield {
+//          if (wasRepeated) {
+//            tryGenRepeatedParamAsJSArray(arg, handleNil = false).fold {
+//              genExpr(arg)
+//            } { genArgs =>
+//              genNew(WrappedArrayClass, WrappedArray_ctor,
+//                  List(js.JSArrayConstr(genArgs)))
+//            }
+//          } else {
+//            genExpr(arg)
+//          }
+//        }
+//      }
     }
 
     /** Gen actual actual arguments to a primitive JS call.
@@ -4840,7 +4840,7 @@ abstract class GenJSCode extends plugins.PluginComponent
           nme.wrapDoubleArray,
           nme.wrapBooleanArray,
           nme.wrapUnitArray,
-          nme.genericWrapArray).map(getMemberMethod(PredefModule, _)).toSet
+          nme.genericWrapArray).map(getMemberMethod(ScalaRunTimeModule, _)).toSet // TODO Cross-version support
 
       def unapply(tree: Apply): Option[Tree] = tree match {
         case Apply(wrapArray_?, List(wrapped))
